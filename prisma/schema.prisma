@@ -55,6 +55,11 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
+model UserPlan {
+  id String @id
+  plan Int
+}
+
 model ShortURL {
   short String @unique @id
   long String
