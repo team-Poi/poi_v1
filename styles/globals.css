@@ -12,6 +12,12 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: Bauhaus;
+  src: url(https://www.fontmirror.com/app_public/files/t/1/bauh93_adea4bebe85d578f77b3370241de7387.ttf)
+    format("ttf");
+}
+
 * {
   font-family: "NanumBarunGothic";
 }
@@ -27,6 +33,7 @@ body {
   color: black;
   font-family: "Material Icons";
   font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 48;
+  pointer-events: none;
 }
 
 .iconV {
