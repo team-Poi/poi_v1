@@ -4,8 +4,12 @@ const nextConfig = {
   async rewrites() {
     return [
       {
-        source: "/:path*",
-        destination: `${process.env.API}/s/:path*?sec=${process.env.SECRET}`,
+        source: "/:id",
+        destination: `${process.env.API}/s/:id?sec=${process.env.SECRET}`,
+      },
+      {
+        source: "/api/create",
+        destination: `${process.env.API}/n?sec=${process.env.SECRET}`,
       },
     ];
   },
