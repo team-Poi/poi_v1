@@ -7,11 +7,18 @@ import isValidURL from "../util/isValidURL";
 import axios from "axios";
 import { useSession } from "next-auth/react";
 import Load from "../components/loading";
+import Link from "next/link";
+
+interface Shorted_url {
+  long: string;
+  short: string;
+}
 
 export default function Home() {
   let [long_url, setLongURL] = useState("");
   let [loading, setLoading] = useState(false);
   let [short_url, setShortURL] = useState("");
+  let [shorted, setShorted] = useState<Shorted_url[]>([]);
   const { data, status } = useSession();
 
   let input_1: HTMLInputElement;
@@ -24,6 +31,14 @@ export default function Home() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     input_2 = document.getElementById("input.url.short")! as HTMLInputElement;
   });
+
+  useEffect(() => {
+    if (typeof localStorage == "undefined") return;
+    let shorts = localStorage.getItem("past");
+    if (!shorts) {
+      localStorage.setItem("past", "[]");
+    } else setShorted(JSON.parse(shorts) as Shorted_url[]);
+  }, []);
 
   return (
     <>
@@ -53,6 +68,24 @@ export default function Home() {
 
       <main>
         <div className="container">
+          <div
+            style={{
+              width: "100%",
+              padding: "16px",
+              borderRadius: "8px",
+            }}
+            className={classNames("card", styles.urlshorter)}
+          >
+            <div className={classNames("card2", styles.info)}>
+              <h3>Url 단축</h3>
+              <p>유저가 제공한 Url을 재미있는 한글문장으로 변환해줍니다!</p>
+            </div>
+            {/* <div className={classNames("card2", styles.info)}>
+              <h3>도매인 서비스</h3>
+              <p>(이름).poi.kr 도매인을 사용할수있습니다!</p>
+            </div> */}
+          </div>
+
           <div
             style={{
               width: "100%",
@@ -127,6 +160,19 @@ export default function Home() {
               <button
                 className={classNames(styles.btn, utyles.dib)}
                 onClick={() => {
+                  const addToLocal = (s: string) => {
+                    if (shorted.filter((v) => v.short == s).length > 0) return;
+                    let newShorted: Shorted_url[] = [
+                      {
+                        long: long_url,
+                        short: s,
+                      },
+                      ...shorted,
+                    ];
+                    if (newShorted.length > 10) newShorted.pop();
+                    setShorted(newShorted);
+                    localStorage.setItem("past", JSON.stringify(newShorted));
+                  };
                   setLoading(true);
                   if (status == "authenticated") {
                     axios
@@ -136,6 +182,7 @@ export default function Home() {
                       })
                       .then((v) => {
                         setShortURL(v.data);
+                        addToLocal(v.data);
                       })
                       .finally(() => {
                         setLoading(false);
@@ -148,6 +195,7 @@ export default function Home() {
                       })
                       .then((v) => {
                         setShortURL(v.data);
+                        addToLocal(v.data);
                       })
                       .finally(() => {
                         setLoading(false);
@@ -269,14 +317,45 @@ export default function Home() {
             }}
             className={classNames("card", styles.urlshorter)}
           >
-            <div className={classNames("card2", styles.info)}>
-              <h3>Url 단축</h3>
-              <p>유저가 제공한 Url을 재미있는 한글문장으로 변환해줍니다!</p>
+            <div>
+              <h2
+                style={{
+                  margin: "0px",
+                  paddingBottom: "8px",
+                }}
+              >
+                URL 단축기록
+                <desc
+                  style={{
+                    fontSize: "0.9rem",
+                    paddingLeft: "0.5rem",
+                    color: "#aaaaaa",
+                  }}
+                >
+                  최근 10개까지만 표시됩니다.
+                </desc>
+              </h2>
             </div>
-            {/* <div className={classNames("card2", styles.info)}>
-              <h3>도매인 서비스</h3>
-              <p>(이름).poi.kr 도매인을 사용할수있습니다!</p>
-            </div> */}
+            {shorted.map((v, i) => {
+              return (
+                <div
+                  className={classNames("card2", styles.info)}
+                  key={`URLS.${i}`}
+                >
+                  <h3>
+                    <Link href={`/${v.short}`}>https://poi.kr/{v.short}</Link>
+                  </h3>
+                  <p
+                    style={{
+                      width: "100%",
+                      wordBreak: "break-all",
+                    }}
+                  >
+                    {v.long}
+                  </p>
+                </div>
+              );
+            })}
           </div>
         </div>
       </main>
