@@ -260,6 +260,24 @@ export default function Home() {
               </button>
             </div>
           </div>
+
+          <div
+            style={{
+              width: "100%",
+              padding: "16px",
+              borderRadius: "8px",
+            }}
+            className={classNames("card", styles.urlshorter)}
+          >
+            <div className={classNames("card2", styles.info)}>
+              <h3>Url 단축</h3>
+              <p>유저가 제공한 Url을 재미있는 한글문장으로 변환해줍니다!</p>
+            </div>
+            {/* <div className={classNames("card2", styles.info)}>
+              <h3>도매인 서비스</h3>
+              <p>(이름).poi.kr 도매인을 사용할수있습니다!</p>
+            </div> */}
+          </div>
         </div>
       </main>
       <style>
