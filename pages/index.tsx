@@ -14,20 +14,6 @@ export default function Home() {
   let [short_url, setShortURL] = useState("");
   const { data, status } = useSession();
 
-  if (status == "loading") {
-    return (
-      <>
-        <div
-          style={{
-            alignItems: "center",
-          }}
-        >
-          Wait For Create Statue...
-        </div>
-      </>
-    );
-  }
-
   return (
     <>
       {loading ? <Load /> : null}
@@ -124,7 +110,7 @@ export default function Home() {
                 });
             }
           }}
-          disabled={!isValidURL(long_url)}
+          disabled={!isValidURL(long_url) || status == "loading"}
         >
           <img
             src="/poi.png"
