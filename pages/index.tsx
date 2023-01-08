@@ -349,6 +349,14 @@ export default function Home() {
                     style={{
                       width: "100%",
                       wordBreak: "break-all",
+                      display: "-webkit-box",
+                      wordWrap: "break-word",
+                      WebkitLineClamp: "2",
+                      WebkitBoxOrient: "vertical",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      maxHeight: "2.5rem",
+                      lineHeight: "1.1rem",
                     }}
                   >
                     {v.long}
