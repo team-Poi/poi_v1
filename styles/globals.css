@@ -45,6 +45,15 @@ body {
 
 .card {
   background: #282833;
+  margin-bottom: 16px;
+}
+
+.card2 {
+  background: #3a3a49;
+  margin: 8px 0px;
+  width: calc(100% - 36px);
+  padding: 16px;
+  border-radius: 4px;
 }
 
 .container {
