@@ -1,0 +1,23 @@
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 13rem;
+  background-color: rgb(51, 53, 54);
+  border-right: 2px rgb(123, 123, 123);
+}
+
+.st {
+  padding-top: 1rem;
+  padding-left: 2rem;
+}
+
+.hb {
+  padding-top: 10px;
+  font-size: 1.2rem;
+}
+
+.hbtn {
+  color: white;
+}

@@ -1,3 +1,21 @@
 .dib {
   display: inline-block;
 }
+
+.dtr {
+  display: table-row;
+}
+
+.dtr > * {
+  display: table-cell;
+}
+
+@media (max-width: 810px) {
+  .dtr {
+    display: block;
+  }
+
+  .dtr > * {
+    display: block;
+  }
+}
