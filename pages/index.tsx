@@ -114,7 +114,34 @@ export default function Home() {
     let shorts = localStorage.getItem("past");
     if (!shorts) {
       localStorage.setItem("past", "[[],[]]");
-    } else setUrlStorages(JSON.parse(shorts) as Shorted_url[][]);
+    } else {
+      // old version error handler
+      if (shorts.length > 2) {
+        localStorage.setItem("past", "[[],[]]");
+        return;
+      }
+      if (shorts.length < 2) {
+        localStorage.setItem("past", "[[],[]]");
+        return;
+      }
+      if (typeof shorts[0] == "undefined") {
+        localStorage.setItem("past", "[[],[]]");
+        return;
+      }
+      if (typeof shorts[1] == "undefined") {
+        localStorage.setItem("past", "[[],[]]");
+        return;
+      }
+      if (typeof shorts[0].length == "undefined") {
+        localStorage.setItem("past", "[[],[]]");
+        return;
+      }
+      if (typeof shorts[1].length == "undefined") {
+        localStorage.setItem("past", "[[],[]]");
+        return;
+      }
+      setUrlStorages(JSON.parse(shorts) as Shorted_url[][]);
+    }
   }, []);
 
   return (
