@@ -117,26 +117,32 @@ export default function Home() {
     } else {
       // old version error handler
       if (shorts.length > 2) {
+        console.log("Length more than 2");
         localStorage.setItem("past", "[[],[]]");
         return;
       }
       if (shorts.length < 2) {
+        console.log("Length less than 2");
         localStorage.setItem("past", "[[],[]]");
         return;
       }
       if (typeof shorts[0] == "undefined") {
+        console.log("undefined 0");
         localStorage.setItem("past", "[[],[]]");
         return;
       }
       if (typeof shorts[1] == "undefined") {
+        console.log("undefined 1");
         localStorage.setItem("past", "[[],[]]");
         return;
       }
       if (typeof shorts[0].length == "undefined") {
+        console.log("undefined 0.length");
         localStorage.setItem("past", "[[],[]]");
         return;
       }
       if (typeof shorts[1].length == "undefined") {
+        console.log("undefined 1.length");
         localStorage.setItem("past", "[[],[]]");
         return;
       }
