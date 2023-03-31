@@ -116,16 +116,6 @@ export default function Home() {
       localStorage.setItem("past", "[[],[]]");
     } else {
       // old version error handler
-      if (shorts.length > 2) {
-        console.log("Length more than 2");
-        localStorage.setItem("past", "[[],[]]");
-        return;
-      }
-      if (shorts.length < 2) {
-        console.log("Length less than 2");
-        localStorage.setItem("past", "[[],[]]");
-        return;
-      }
       if (typeof shorts[0] == "undefined") {
         console.log("undefined 0");
         localStorage.setItem("past", "[[],[]]");
