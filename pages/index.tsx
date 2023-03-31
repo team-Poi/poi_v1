@@ -13,6 +13,9 @@ interface Shorted_url {
   short: string;
 }
 
+let inter: any;
+let inter2: any;
+
 export default function Home() {
   let [long_url, setLongURL] = useState("");
   let [loading, setLoading] = useState(false);
@@ -20,6 +23,8 @@ export default function Home() {
   let [urlStorages, setUrlStorages] = useState<Shorted_url[][]>([[], []]);
   let [imageURL, setImageURL] = useState("");
   let [hasImage, setHasImage] = useState(false);
+  let [fileDroping, setFileDroping] = useState(false);
+  let [dropError, setDropError] = useState("");
 
   let input_1: HTMLInputElement;
   let input_2: HTMLInputElement;
@@ -140,9 +145,101 @@ export default function Home() {
     }
   }, []);
 
+  const errorEnder = (str: string) => {
+    setDropError(str);
+    if (typeof inter != "undefined") {
+      clearInterval(inter);
+      inter = null;
+    }
+    if (typeof inter2 != "undefined") {
+      clearInterval(inter2);
+      inter2 = null;
+    }
+    inter = setTimeout(() => {
+      setFileDroping(false);
+      inter2 = setTimeout(() => {
+        setDropError("");
+      }, 200);
+      inter = null;
+    }, 1000);
+  };
+
   return (
-    <>
+    <div
+      onDragOver={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setFileDroping(true);
+      }}
+      onDragEnter={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setFileDroping(true);
+      }}
+      onDragLeave={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      }}
+      onDrop={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        let files = e.dataTransfer.files;
+        if (files.length > 1)
+          return errorEnder("한번에 최대 1개까지만 업로드 할 수 있습니다 :(");
+        let file = files[0];
+        if (!file.type.startsWith("image/"))
+          return errorEnder("이미지만 지원합니다.");
+        setFileDroping(false);
+        upload(file);
+      }}
+    >
       {loading ? <Load /> : null}
+      <div
+        style={{
+          backgroundColor: "rgba(255,255,255,.95)",
+          position: "fixed",
+          top: 0,
+          bottom: 0,
+          left: 0,
+          right: 0,
+          zIndex: 9999,
+          opacity: fileDroping ? "1" : "0",
+          transition: "all .2s ease",
+          pointerEvents: fileDroping ? "all" : "none",
+        }}
+      >
+        <div
+          style={{
+            border: "dashed 4px",
+            position: "absolute",
+            top: "10px",
+            bottom: "10px",
+            left: "10px",
+            right: "10px",
+            borderColor: dropError.length == 0 ? "gray" : "lightcolor",
+          }}
+        >
+          <div
+            style={{
+              position: "absolute",
+              top: "50%",
+              right: 0,
+              left: 0,
+              textAlign: "center",
+              color: dropError.length == 0 ? "grey" : "#ff1111",
+              fontSize: 36,
+              margin: "10px",
+              animationName: dropError.length == 0 ? "" : "slidein",
+              animationDuration: ".3s",
+            }}
+          >
+            <div>
+              {dropError.length == 0 ? "Drop해서 이미지 업로드" : dropError}
+            </div>
+          </div>
+        </div>
+      </div>
+
       <header className={styles.header}>
         <div className="container">
           <h1
@@ -652,8 +749,37 @@ export default function Home() {
             margin: 0;
             padding: 0;
           }
+          @keyframes slidein {
+            0% {
+              transform: translateX(0px) translateY(0px);
+            }
+            12.5% {
+              transform: translateX(1rem) translateY(-1rem);
+            }
+            25% {
+              transform: translateX(0px) translateY(0.2rem);
+            }
+            37.5% {
+              transform: translateX(-1rem) translateY(1rem);
+            }
+            50% {
+              transform: translateX(0px) translateY(-0.3rem);
+            }
+            62.5 {
+              transform: translateX(1rem) translateY(-1rem);
+            }
+            75% {
+              transform: translateX(0.7rem) translateY(-0.5rem);
+            }
+            87.5% {
+              transform: translateX(0.3rem) translateY(-0.3rem);
+            }
+            100% {
+              transform: translateX(0px) translateY(0px);
+            }
+          }
           `}
       </style>
-    </>
+    </div>
   );
 }
