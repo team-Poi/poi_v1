@@ -137,16 +137,19 @@ export default function Home() {
     const shorts = localStorage.getItem("past");
     if (!shorts) return localStorage.setItem("past", "[[],[]]");
 
-    if (typeof shorts[0] == "undefined")
-      return localStorage.setItem("past", "[[],[]]");
-    if (typeof shorts[1] == "undefined")
-      return localStorage.setItem("past", "[[],[]]");
-    if (typeof shorts[0].length == "undefined")
-      return localStorage.setItem("past", "[[],[]]");
-    if (typeof shorts[1].length == "undefined")
-      return localStorage.setItem("past", "[[],[]]");
+    let parsed = JSON.parse(shorts);
+    try {
+      if (typeof parsed[0] == "undefined")
+        return localStorage.setItem("past", "[[],[]]");
+      if (typeof parsed[1] == "undefined")
+        return localStorage.setItem("past", "[[],[]]");
+      if (typeof parsed[0].length == "undefined")
+        return localStorage.setItem("past", "[[],[]]");
+      if (typeof parsed[1].length == "undefined")
+        return localStorage.setItem("past", "[[],[]]");
 
-    setUrlStorages(JSON.parse(shorts) as Shorted_url[][]);
+      setUrlStorages(parsed as Shorted_url[][]);
+    } catch (e) {}
   }, []);
 
   return (
