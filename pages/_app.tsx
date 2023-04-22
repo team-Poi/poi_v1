@@ -6,11 +6,6 @@ export default function App({ Component, pageProps }: AppProps) {
   return (
     <>
       <Head>
-        <script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7648972371680937"
-          crossOrigin="anonymous"
-        ></script>
         <link
           rel="apple-touch-icon"
           sizes="57x57"

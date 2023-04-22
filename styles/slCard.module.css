@@ -1,0 +1,31 @@
+.info > h3 {
+  padding: 0px;
+  margin: 0px;
+  font-weight: bold;
+}
+
+.info > p {
+  margin: 0px;
+  font-size: 1rem;
+}
+
+.info {
+  background: #3a3a49;
+  margin: 8px 0px;
+  width: calc(100% - 36px);
+  padding: 16px;
+  border-radius: 4px;
+}
+
+.needToBeDoted {
+  width: 100%;
+  word-break: break-all;
+  display: -webkit-box;
+  word-wrap: break-word;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-height: 2.5rem;
+  line-height: 1.1rem;
+}

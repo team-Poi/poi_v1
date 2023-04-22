@@ -1,0 +1,25 @@
+.header {
+  background: #131314;
+  margin: 0px;
+  padding: 12px 0px;
+  margin-bottom: 16px;
+}
+
+.title {
+  font-size: 2.5rem;
+  padding-top: 10px;
+  margin: 0px;
+  padding: 0px;
+}
+
+.desc {
+  padding-top: 10px;
+  margin: 0px;
+  padding: 0px;
+  font-size: 21px;
+}
+@media (max-width: 800px) {
+  .desc {
+    font-size: 18px;
+  }
+}

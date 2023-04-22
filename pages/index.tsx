@@ -1,42 +1,46 @@
 /* eslint-disable @next/next/no-img-element */
 import classNames from "classnames";
-import { useEffect, useRef, useState } from "react";
+import axios, { AxiosHeaders, RawAxiosRequestHeaders } from "axios";
+import { MutableRefObject, useEffect, useRef, useState } from "react";
+
 import styles from "../styles/Home.module.css";
 import utyles from "../styles/util.module.css";
+import dtyles from "../styles/dragNdrop.module.css";
 import isValidURL from "../util/isValidURL";
-import axios, { AxiosHeaders, RawAxiosRequestHeaders } from "axios";
+
 import Load from "../components/loading";
-import Link from "next/link";
+import Header from "../components/header";
+import SecondLayer_CardView from "../components/2L_CardView";
+import Z3H from "../components/z3h";
 
-interface Shorted_url {
-  long: string;
-  short: string;
-}
+import { Shorted_url } from "../types/shortedURL";
+import HistoryView from "../components/historyView";
 
-let inter: any;
-let inter2: any;
+type Timeout = number | NodeJS.Timeout | undefined;
+
+let inter: Timeout;
+let inter2: Timeout;
 
 export default function Home() {
-  let [long_url, setLongURL] = useState("");
-  let [loading, setLoading] = useState(false);
-  let [short_url, setShortURL] = useState("");
-  let [urlStorages, setUrlStorages] = useState<Shorted_url[][]>([[], []]);
-  let [imageURL, setImageURL] = useState("");
-  let [hasImage, setHasImage] = useState(false);
-  let [fileDroping, setFileDroping] = useState(false);
-  let [dropError, setDropError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  let input_1: HTMLInputElement;
-  let input_2: HTMLInputElement;
-  let input_4: HTMLInputElement;
+  const [long_url, setLongURL] = useState("");
+  const [short_url, setShortURL] = useState("");
 
-  let input_3 = useRef(null);
+  const [imageURL, setImageURL] = useState("");
+  const [hasImage, setHasImage] = useState(false);
 
-  async function shorten(
-    long_url: string,
-    storageIndex: number,
-    showAs?: string
-  ) {
+  const [fileDroping, setFileDroping] = useState(false);
+  const [dropError, setDropError] = useState("");
+
+  const [urlStorages, setUrlStorages] = useState<Shorted_url[][]>([[], []]);
+
+  const input_1 = useRef(null);
+  const input_2 = useRef(null);
+  const input_4 = useRef(null);
+  const input_3 = useRef(null);
+
+  const shorten = (long_url: string, storageIndex: number, showAs?: string) => {
     return new Promise<string>((resolve, reject) => {
       const addToLocal = (s: string) => {
         if (urlStorages[storageIndex].filter((v) => v.short == s).length > 0)
@@ -70,9 +74,9 @@ export default function Home() {
           setLoading(false);
         });
     });
-  }
+  };
 
-  async function upload(file: File) {
+  const upload = async (file: File) => {
     setLoading(true);
     let headers: RawAxiosRequestHeaders | AxiosHeaders = {};
 
@@ -102,67 +106,48 @@ export default function Home() {
       .then(async (dat) => {
         setImageURL(await shorten(dat.data.image.display_url, 1, file.name));
       });
-  }
+  };
 
-  useEffect(() => {
-    if (typeof document == "undefined") return;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    input_1 = document.getElementById("input.url.long")! as HTMLInputElement;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    input_2 = document.getElementById("input.url.short")! as HTMLInputElement;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    input_4 = document.getElementById("image.url")! as HTMLInputElement;
-  });
-
-  useEffect(() => {
-    if (typeof localStorage == "undefined") return;
-    let shorts = localStorage.getItem("past");
-    if (!shorts) {
-      localStorage.setItem("past", "[[],[]]");
-    } else {
-      // old version error handler
-      if (typeof shorts[0] == "undefined") {
-        console.log("undefined 0");
-        localStorage.setItem("past", "[[],[]]");
-        return;
-      }
-      if (typeof shorts[1] == "undefined") {
-        console.log("undefined 1");
-        localStorage.setItem("past", "[[],[]]");
-        return;
-      }
-      if (typeof shorts[0].length == "undefined") {
-        console.log("undefined 0.length");
-        localStorage.setItem("past", "[[],[]]");
-        return;
-      }
-      if (typeof shorts[1].length == "undefined") {
-        console.log("undefined 1.length");
-        localStorage.setItem("past", "[[],[]]");
-        return;
-      }
-      setUrlStorages(JSON.parse(shorts) as Shorted_url[][]);
-    }
-  }, []);
+  const asElement = (ref: MutableRefObject<null>) => {
+    return ref.current! as HTMLInputElement;
+  };
 
   const errorEnder = (str: string) => {
     setDropError(str);
     if (typeof inter != "undefined") {
       clearInterval(inter);
-      inter = null;
+      inter = undefined;
     }
     if (typeof inter2 != "undefined") {
       clearInterval(inter2);
-      inter2 = null;
+      inter2 = undefined;
     }
     inter = setTimeout(() => {
       setFileDroping(false);
       inter2 = setTimeout(() => {
         setDropError("");
       }, 200);
-      inter = null;
+      inter = undefined;
     }, 1000);
   };
+
+  useEffect(() => {
+    if (typeof localStorage == "undefined") return;
+
+    const shorts = localStorage.getItem("past");
+    if (!shorts) return localStorage.setItem("past", "[[],[]]");
+
+    if (typeof shorts[0] == "undefined")
+      return localStorage.setItem("past", "[[],[]]");
+    if (typeof shorts[1] == "undefined")
+      return localStorage.setItem("past", "[[],[]]");
+    if (typeof shorts[0].length == "undefined")
+      return localStorage.setItem("past", "[[],[]]");
+    if (typeof shorts[1].length == "undefined")
+      return localStorage.setItem("past", "[[],[]]");
+
+    setUrlStorages(JSON.parse(shorts) as Shorted_url[][]);
+  }, []);
 
   return (
     <div
@@ -194,43 +179,25 @@ export default function Home() {
       }}
     >
       {loading ? <Load /> : null}
+      {/* Drag N Drop */}
       <div
+        className={dtyles.container}
         style={{
-          backgroundColor: "rgba(255,255,255,.95)",
-          position: "fixed",
-          top: 0,
-          bottom: 0,
-          left: 0,
-          right: 0,
-          zIndex: 9999,
           opacity: fileDroping ? "1" : "0",
-          transition: "all .2s ease",
           pointerEvents: fileDroping ? "all" : "none",
         }}
       >
         <div
+          className={dtyles.dots}
           style={{
-            border: "dashed 4px",
-            position: "absolute",
-            top: "10px",
-            bottom: "10px",
-            left: "10px",
-            right: "10px",
             borderColor: dropError.length == 0 ? "gray" : "lightcolor",
           }}
         >
           <div
+            className={dtyles.center}
             style={{
-              position: "absolute",
-              top: "50%",
-              right: 0,
-              left: 0,
-              textAlign: "center",
-              color: dropError.length == 0 ? "grey" : "#ff1111",
-              fontSize: 36,
-              margin: "10px",
               animationName: dropError.length == 0 ? "" : "slidein",
-              animationDuration: ".3s",
+              color: dropError.length == 0 ? "grey" : "#ff1111",
             }}
           >
             <div>
@@ -240,103 +207,51 @@ export default function Home() {
         </div>
       </div>
 
-      <header className={styles.header}>
-        <div className="container">
-          <h1
-            className={styles.title}
-            style={{
-              padding: "0px",
-              margin: "0px",
-            }}
-          >
-            Poi.kr
-          </h1>
-          <h3
-            style={{
-              padding: "0px",
-              margin: "0px",
-            }}
-            className={styles.desc}
-          >
-            외우기 쉬운 링크 단축 서비스
-          </h3>
-        </div>
-      </header>
+      <Header />
 
       <main>
         <div className="container">
-          <div className={classNames("card", styles.urlshorter)}>
-            <div className={classNames("card2", styles.info)}>
-              <h3>Url 단축</h3>
-              <p>유저가 제공한 Url을 재미있는 한글문장으로 변환해줍니다!</p>
-            </div>
-            <div className={classNames("card2", styles.info)}>
-              <h3>이미지 URL화</h3>
-              <p>
-                최대 32MB의 이미지를 업로드 하여, 손쉽게 이미지를 공유 할 수
-                있습니다.
-              </p>
-            </div>
+          {/* Feature List */}
+          <div className={styles.feature}>
+            <SecondLayer_CardView
+              name="URL 단축"
+              desc="유저가 제공한 Url을 재미있는 한글문장으로 변환해줍니다!"
+            />
+            <SecondLayer_CardView
+              name="이미지 호스팅"
+              desc="최대 32MB의 이미지를 업로드 하여, 손쉽게 이미지를 공유 할 수 있습니다."
+            />
           </div>
 
-          <div className={classNames("card", styles.urlshorter)}>
-            <div>
-              <h2
-                style={{
-                  margin: "0px",
-                  paddingBottom: "8px",
-                }}
-              >
-                URL 단축하기
-              </h2>
-            </div>
+          {/* Url shorten */}
+          <div className={styles.feature}>
+            <h2 className={utyles.secName}>URL 단축하기</h2>
             <div className={classNames("card", utyles.dtr)}>
               <div
-                className={classNames(styles.iptt, utyles.dib)}
-                style={{
-                  padding: "18px 24px",
-                }}
+                className={classNames(styles.inputContainer, utyles.dib)}
                 onClick={() => {
-                  input_1.focus();
+                  asElement(input_1).focus();
                 }}
               >
-                <div
-                  style={{
-                    display: "block",
-                  }}
-                >
+                <div className={utyles.db}>
                   <div
-                    style={{
-                      display: "inline",
-                      position: "relative",
-                      top: "50%",
-                      transform: "translateY(-50%)",
-                      height: "24px",
-                      maxHeight: "24px",
-                    }}
-                    className="iconV"
+                    className={classNames("iconV", styles.pInputIconContainer)}
                   >
                     <span
-                      className="material-symbols-outlined iconV"
-                      style={{
-                        position: "absolute",
-                        transform: "translateY(4px)",
-                      }}
+                      className={classNames(
+                        "material-symbols-outlined",
+                        "iconV",
+                        styles.pInputIcon
+                      )}
                     >
                       link
                     </span>
                   </div>
                   <input
-                    type="text"
                     placeholder="URL을 입력해 주세요"
                     value={long_url}
-                    id="input.url.long"
-                    style={{
-                      width: "100%",
-                      marginLeft: "28px",
-                      transform: "translateY(2px)",
-                    }}
-                    className={styles.ipt}
+                    ref={input_1}
+                    className={styles.input}
                     onChange={(e) => {
                       setLongURL(e.target.value);
                     }}
@@ -350,14 +265,7 @@ export default function Home() {
                 }}
                 disabled={!isValidURL(long_url)}
               >
-                <div
-                  style={{
-                    display: "inline-block",
-                    verticalAlign: "middle",
-                  }}
-                >
-                  단축하기
-                </div>
+                <div className={(utyles.dib, utyles.vam)}>단축하기</div>
                 <img
                   src="/poi.png"
                   alt=">"
@@ -373,69 +281,44 @@ export default function Home() {
                 />
               </button>
             </div>
-            <div
-              style={{
-                height: "0.3rem",
-              }}
-            ></div>
+            <Z3H />
             <div className={classNames("card", utyles.dtr)}>
               <div
-                className={classNames(styles.iptt, utyles.dib)}
-                style={{
-                  padding: "18px 24px",
-                }}
+                className={classNames(styles.inputContainer, utyles.dib)}
                 onClick={() => {
-                  input_2.focus();
-                  input_2.select();
+                  asElement(input_2).focus();
+                  asElement(input_2).select();
                 }}
               >
-                <div
-                  style={{
-                    display: "block",
-                  }}
-                >
+                <div className={utyles.db}>
                   <div
-                    style={{
-                      display: "inline",
-                      position: "relative",
-                      top: "50%",
-                      transform: "translateY(-50%)",
-                      height: "24px",
-                      maxHeight: "24px",
-                    }}
-                    className="iconV"
+                    className={classNames("iconV", styles.pInputIconContainer)}
                   >
                     <span
-                      className="material-symbols-outlined iconV"
-                      style={{
-                        position: "absolute",
-                        transform: "translateY(4px)",
-                      }}
+                      className={classNames(
+                        "material-symbols-outlined",
+                        "iconV",
+                        styles.pInputIcon
+                      )}
                     >
                       arrow_forward
                     </span>
                   </div>
                   <input
-                    type="text"
                     placeholder="단축된 URL"
+                    ref={input_2}
                     value={
                       short_url.length == 0 ? "" : `https://poi.kr/${short_url}`
                     }
-                    id="input.url.short"
-                    style={{
-                      width: "100%",
-                      marginLeft: "28px",
-                      transform: "translateY(2px)",
-                    }}
-                    className={styles.ipt}
+                    className={styles.input}
                   />
                 </div>
               </div>
               <button
                 className={classNames(styles.btn, utyles.dib, styles.ctn)}
                 onClick={() => {
-                  input_2.focus();
-                  input_2.select();
+                  asElement(input_2).focus();
+                  asElement(input_2).select();
                   document.execCommand("copy");
                 }}
                 disabled={short_url.length == 0}
@@ -443,108 +326,29 @@ export default function Home() {
                   padding: "24px 36px",
                 }}
               >
-                <div
-                  style={{
-                    display: "inline-block",
-                    verticalAlign: "middle",
-                  }}
-                >
-                  복사하기
-                </div>
+                <div className={(utyles.dib, utyles.vam)}>복사하기</div>
               </button>
             </div>
           </div>
 
-          <div className={classNames("card", styles.urlshorter)}>
-            <div>
-              <h2
-                style={{
-                  margin: "0px",
-                  paddingBottom: "8px",
-                }}
-              >
-                URL 단축기록
-                <desc
-                  style={{
-                    fontSize: "0.9rem",
-                    paddingLeft: "0.5rem",
-                    color: "#aaaaaa",
-                  }}
-                >
-                  최근 10개까지만 표시됩니다.
-                </desc>
-              </h2>
-            </div>
-            {urlStorages[0].map((v, i) => {
-              return (
-                <div
-                  className={classNames("card2", styles.info)}
-                  key={`URLS.${i}`}
-                >
-                  <h3>
-                    <Link href={`/${v.short}`}>https://poi.kr/{v.short}</Link>
-                  </h3>
-                  <p
-                    style={{
-                      width: "100%",
-                      wordBreak: "break-all",
-                      display: "-webkit-box",
-                      wordWrap: "break-word",
-                      WebkitLineClamp: "2",
-                      WebkitBoxOrient: "vertical",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      maxHeight: "2.5rem",
-                      lineHeight: "1.1rem",
-                    }}
-                  >
-                    {v.long}
-                  </p>
-                </div>
-              );
-            })}
-          </div>
+          {/* Shorted Url List */}
+          <HistoryView history={urlStorages[0]} name="URL 단축화 기록" />
 
-          <div className={classNames("card", styles.urlshorter)}>
-            <div>
-              <h2
-                style={{
-                  margin: "0px",
-                  paddingBottom: "8px",
-                }}
-              >
-                이미지 URL화
-              </h2>
-            </div>
+          {/* Upload Img */}
+          <div className={styles.feature}>
+            <h2 className={utyles.secName}>이미지 업로드</h2>
             <div className={classNames("card", utyles.dtr)}>
-              <div
-                className={classNames(styles.iptt, utyles.dib)}
-                style={{
-                  padding: "18px 24px",
-                }}
-              >
-                <div
-                  style={{
-                    display: "block",
-                  }}
-                >
+              <div className={classNames(styles.inputContainer, utyles.dib)}>
+                <div className={utyles.db}>
                   <div
-                    style={{
-                      display: "inline",
-                      position: "relative",
-                      top: "50%",
-                      transform: "translateY(-50%)",
-                      height: "24px",
-                      maxHeight: "24px",
-                    }}
-                    className="iconV"
+                    className={classNames("iconV", styles.pInputIconContainer)}
                   >
                     <span
-                      className="material-symbols-outlined iconV"
-                      style={{
-                        position: "absolute",
-                        transform: "translateY(4px)",
-                      }}
+                      className={classNames(
+                        "material-symbols-outlined",
+                        "iconV",
+                        styles.pInputIcon
+                      )}
                     >
                       image
                     </span>
@@ -552,7 +356,7 @@ export default function Home() {
                   <input
                     type="file"
                     ref={input_3}
-                    className={styles.ipt}
+                    className={styles.input}
                     style={{
                       marginLeft: "32px",
                       color: "black",
@@ -581,14 +385,7 @@ export default function Home() {
                 }}
                 disabled={!hasImage}
               >
-                <div
-                  style={{
-                    display: "inline-block",
-                    verticalAlign: "middle",
-                  }}
-                >
-                  URL화
-                </div>
+                <div className={utyles.vam}>URL화</div>
                 <img
                   src="/poi.png"
                   alt=">"
@@ -604,72 +401,44 @@ export default function Home() {
                 />
               </button>
             </div>
-
-            <div
-              style={{
-                height: "0.3rem",
-              }}
-            ></div>
-
+            <Z3H />
             <div className={classNames("card", utyles.dtr)}>
               <div
-                className={classNames(styles.iptt, utyles.dib)}
-                style={{
-                  padding: "18px 24px",
-                }}
+                className={classNames(styles.inputContainer, utyles.dib)}
                 onClick={() => {
-                  input_4.focus();
-                  input_4.select();
+                  asElement(input_4).focus();
+                  asElement(input_4).select();
                 }}
               >
-                <div
-                  style={{
-                    display: "block",
-                  }}
-                >
+                <div className={utyles.db}>
                   <div
-                    style={{
-                      display: "inline",
-                      position: "relative",
-                      top: "50%",
-                      transform: "translateY(-50%)",
-                      height: "24px",
-                      maxHeight: "24px",
-                    }}
-                    className="iconV"
+                    className={classNames("iconV", styles.pInputIconContainer)}
                   >
                     <span
-                      className="material-symbols-outlined iconV"
-                      style={{
-                        position: "absolute",
-                        transform: "translateY(4px)",
-                      }}
+                      className={classNames(
+                        "material-symbols-outlined",
+                        "iconV",
+                        styles.pInputIcon
+                      )}
                     >
                       arrow_forward
                     </span>
                   </div>
                   <input
-                    type="text"
                     placeholder="이미지 URL"
                     value={
                       imageURL.length == 0 ? "" : `https://poi.kr/${imageURL}`
                     }
-                    id="image.url"
-                    style={{
-                      width: "100%",
-                      marginLeft: "28px",
-                      transform: "translateY(2px)",
-                    }}
-                    className={styles.ipt}
+                    ref={input_4}
+                    className={styles.input}
                   />
                 </div>
               </div>
-
               <button
                 className={classNames(styles.btn, utyles.dib, styles.ctn)}
                 onClick={() => {
-                  input_4.focus();
-                  input_4.select();
+                  asElement(input_4).focus();
+                  asElement(input_4).select();
                   document.execCommand("copy");
                 }}
                 disabled={imageURL.length == 0}
@@ -689,97 +458,10 @@ export default function Home() {
             </div>
           </div>
 
-          <div className={classNames("card", styles.urlshorter)}>
-            <div>
-              <h2
-                style={{
-                  margin: "0px",
-                  paddingBottom: "8px",
-                }}
-              >
-                이미지 URL화 기록
-                <desc
-                  style={{
-                    fontSize: "0.9rem",
-                    paddingLeft: "0.5rem",
-                    color: "#aaaaaa",
-                  }}
-                >
-                  최근 10개까지만 표시됩니다.
-                </desc>
-              </h2>
-            </div>
-            {urlStorages[1].map((v, i) => {
-              return (
-                <div
-                  className={classNames("card2", styles.info)}
-                  key={`URLS.${i}`}
-                >
-                  <h3>
-                    <Link href={`/${v.short}`}>https://poi.kr/{v.short}</Link>
-                  </h3>
-                  <p
-                    style={{
-                      width: "100%",
-                      wordBreak: "break-all",
-                      display: "-webkit-box",
-                      wordWrap: "break-word",
-                      WebkitLineClamp: "2",
-                      WebkitBoxOrient: "vertical",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      maxHeight: "2.5rem",
-                      lineHeight: "1.1rem",
-                    }}
-                  >
-                    {v.long}
-                  </p>
-                </div>
-              );
-            })}
-          </div>
+          {/* Uploaded Img List */}
+          <HistoryView history={urlStorages[1]} name="이미지 업로드 기록" />
         </div>
       </main>
-      <style>
-        {`
-          html {
-            overflow-x: hidden;
-          }
-          body {
-            margin: 0;
-            padding: 0;
-          }
-          @keyframes slidein {
-            0% {
-              transform: translateX(0px) translateY(0px);
-            }
-            12.5% {
-              transform: translateX(1rem) translateY(-1rem);
-            }
-            25% {
-              transform: translateX(0px) translateY(0.2rem);
-            }
-            37.5% {
-              transform: translateX(-1rem) translateY(1rem);
-            }
-            50% {
-              transform: translateX(0px) translateY(-0.3rem);
-            }
-            62.5 {
-              transform: translateX(1rem) translateY(-1rem);
-            }
-            75% {
-              transform: translateX(0.7rem) translateY(-0.5rem);
-            }
-            87.5% {
-              transform: translateX(0.3rem) translateY(-0.3rem);
-            }
-            100% {
-              transform: translateX(0px) translateY(0px);
-            }
-          }
-          `}
-      </style>
     </div>
   );
 }

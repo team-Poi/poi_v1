@@ -2,6 +2,10 @@
   display: inline-block;
 }
 
+.db {
+  display: block;
+}
+
 .dtr {
   display: table-row;
 }
@@ -18,4 +22,20 @@
   .dtr > * {
     display: block;
   }
+}
+
+.vam {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.secName {
+  margin: 0px;
+  padding-bottom: 0px;
+}
+
+.secName > desc {
+  font-size: 0.9rem;
+  padding-left: 0.5rem;
+  color: #aaaaaa;
 }

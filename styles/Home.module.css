@@ -1,40 +1,6 @@
 .main {
   padding-left: 4px;
 }
-.title {
-  font-size: 2.5rem;
-  padding-top: 10px;
-  margin: 0px;
-}
-.desc {
-  padding-top: 10px;
-  font-size: 21px;
-}
-@media (max-width: 800px) {
-  .desc {
-    font-size: 18px;
-  }
-}
-
-.iptt {
-  height: 2rem;
-  display: flex;
-  cursor: text;
-  background-color: #f2f2f2;
-  color: 222;
-  border-radius: 8px;
-  width: 100%;
-}
-
-.ipt {
-  outline: none;
-  border: none;
-  position: relative;
-  width: 100%;
-  margin-left: 16px;
-  font-size: 18px;
-  background: none;
-}
 
 .btn {
   outline: none;
@@ -51,11 +17,70 @@
   margin-left: 8px;
 }
 
-.urlshorter {
+.feature {
   width: 100%;
   padding: 16px;
   border-radius: 8px;
+  background: #282833;
+  margin-bottom: 16px;
 }
+
+/* 
+
+  POI.Component.Input
+
+*/
+
+.ctn {
+  background: rgb(22, 167, 234) !important;
+}
+
+.ctn:disabled {
+  cursor: no-drop;
+  background: rgb(18, 144, 202) !important;
+}
+
+.inputContainer {
+  height: 2rem;
+  display: flex;
+  cursor: text;
+  background-color: #f2f2f2;
+  color: 222;
+  border-radius: 8px;
+  width: 100%;
+  padding: 18px 24px;
+}
+
+.input {
+  outline: none;
+  border: none;
+  position: relative;
+  width: 100%;
+  margin-left: 28px;
+  font-size: 18px;
+  background: none;
+  transform: translateY(2px);
+}
+
+.pInputIconContainer {
+  display: inline;
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 24px;
+  max-height: 24px;
+}
+
+.pInputIcon {
+  position: absolute;
+  transform: translateY(4px);
+}
+
+/*
+
+Flexable CSS
+
+*/
 
 @media (max-width: 810px) {
   .btn {
@@ -65,10 +90,10 @@
     padding-bottom: 16px;
     width: 100%;
   }
-  .iptt {
+  .inputContainer {
     max-width: calc(100% - 48px);
   }
-  .urlshorter {
+  .feature {
     padding: 16px 0px !important;
   }
 }
@@ -85,15 +110,6 @@
 .modal {
   width: 3rem;
   display: none;
-}
-
-.ctn {
-  background: rgb(22, 167, 234);
-}
-
-.ctn:disabled {
-  cursor: no-drop;
-  background: rgb(18, 144, 202);
 }
 
 .btn:hover > .imgx {
@@ -115,44 +131,4 @@
   animation-iteration-count: infinite;
   animation-timing-function: ease-in-out;
   z-index: 100000;
-}
-
-@keyframes loading {
-  0% {
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%) rotate(0deg);
-    padding-bottom: 6rem;
-  }
-
-  50% {
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%) rotate(180deg);
-    padding-bottom: 6rem;
-  }
-
-  100% {
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%) rotate(360deg);
-    padding-bottom: 6rem;
-  }
-}
-
-.header {
-  background: #131314;
-  margin: 0px;
-  padding: 12px 0px;
-  margin-bottom: 16px;
-}
-
-.info > h3 {
-  padding: 0px;
-  margin: 0px;
-  font-weight: bold;
-}
-.info > p {
-  margin: 0px;
-  font-size: 1rem;
 }
