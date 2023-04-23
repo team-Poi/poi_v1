@@ -11,7 +11,8 @@
 
 ## 링크 단축
 
-DB에 저장 및 로드
+[단어 함수](https://github.com/Oein/poi/blob/main/server/wordList/getWord.js)를 통해 주소 생성.
+DB에 저장 및 불러오기
 
 ## 이미지 호스팅
 
